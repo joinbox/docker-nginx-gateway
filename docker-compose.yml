@@ -1,0 +1,28 @@
+version: '2'
+services:
+  dummy-service-one:
+    image: dummy-service-one
+    container_name: 'dummy-service-one'
+    environment:
+      - NODE_ENV=dev
+    command: node /home/ubuntu/app/index.js
+    ports:
+      - "10201:10201"
+  dummy-service-two:
+    image: dummy-service-two
+    container_name: 'dummy-service-two'
+    environment:
+      - NODE_ENV=dev
+    command: node /home/ubuntu/app/index.js
+    ports:
+      - "10202:10202"
+  gateway:
+    image: gateway
+    container_name: 'gateway'
+    command: nginx -g 'daemon off;'
+    ports:
+      - "80:80"
+      - "443:443"
+    links:
+      - dummy-service-one:dummy-service-one
+      - dummy-service-two:dummy-service-two
