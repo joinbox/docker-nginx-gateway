@@ -5,6 +5,8 @@ services:
     container_name: 'dummy-service-one'
     environment:
       - NODE_ENV=dev
+      - NETWORK_ACCESS=internal
+      - VIRTUAL_HOST=dummy-service-one.l.dns.porn
     command: node /home/ubuntu/app/index.js
     ports:
       - "10201:10201"
@@ -13,16 +15,34 @@ services:
     container_name: 'dummy-service-two'
     environment:
       - NODE_ENV=dev
+      - NETWORK_ACCESS=internal
+      - VIRTUAL_HOST=dummy-service-two.l.dns.porn
     command: node /home/ubuntu/app/index.js
     ports:
       - "10202:10202"
+  proxy:
+    image: nginx
+    container_name: proxy
+    ports:
+      - "11111:11111"
+    volumes:
+      - /etc/nginx/conf.d
+      - ./conf/proxy/network_internal.conf:/etc/nginx/network_internal.conf
+  dockergen:
+    image: jwilder/docker-gen
+    command: -notify-sighup proxy -watch /etc/docker-gen/templates/nginx.tmpl /etc/nginx/conf.d/default.conf
+    volumes_from:
+      - proxy
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./conf/proxy/nginx.tmpl:/etc/docker-gen/templates/nginx.tmpl
   gateway:
     image: gateway
     container_name: 'gateway'
-    command: nginx -g 'daemon off;'
+    command:  /bin/bash -c "envsubst < /etc/nginx/conf.d/gateway.tmpl > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"
+    network_mode: "host"
+    environment:
+      - DNS_POSTFIX=l.dns.porn
     ports:
       - "80:80"
       - "443:443"
-    links:
-      - dummy-service-one:dummy-service-one
-      - dummy-service-two:dummy-service-two

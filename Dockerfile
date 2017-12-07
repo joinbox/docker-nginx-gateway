@@ -4,9 +4,7 @@ FROM nginx:latest
 RUN apt update
 RUN apt install -y openssl
 
-COPY conf/default.conf /etc/nginx/conf.d/default.conf
-
-COPY  conf/sites/* /etc/nginx/sites-enabled/
+COPY conf/gateway/gateway.tmpl /etc/nginx/conf.d/gateway.tmpl
 
 # create certificates
 RUN openssl req \

@@ -1,0 +1,14 @@
+server {
+    listen       80;
+    listen       443 ssl;
+    server_name  gateway.${DNS_POSTFIX};
+    resolver 8.8.8.8;
+
+    ssl_certificate /etc/ssl/certs/nginx-selfsigned.crt;
+    ssl_certificate_key /etc/ssl/private/nginx-selfsigned.key;
+
+
+    location ~* ^[^\/]*\/([^\/]*)(.*)$ {
+        proxy_pass http://$1.${DNS_POSTFIX}:11111$2;
+    }
+}
