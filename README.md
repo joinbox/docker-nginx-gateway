@@ -1,10 +1,29 @@
 # Nginx Gateway Docker Container
 
-A Docker container with Nginx serving as gateway for the two dummy projects
+A Docker container with Nginx serving as gateway for the two dummy projects.
+A [proxy](https://github.com/jwilder/nginx-proxy) for the service resolution.
+
+**How it works**
+
+You access your servicese trought the gateway eg. `gateway.l.dns.porn/dummy-service-one/query`
+The gateway rewrites the request to match the DNS name: The first part of the path represents the service name, the rest of the path is the query.
+After rewriting the gateway adds the service DNS name as proxy path.
+The idea is to have on gateway for the Project to handle external request and one proxy per docker host to resolve the services on the host.
+
+
+**Configuration**
+
+The configurations can be made in the `docker-compose.yaml` file.
+
+- VIRTUAL_HOST: The registered DNS name of the service.
+- NETWORK_ACCESS: Expose/restrict public access to the service.
+- DNS_POSTFIX: The post fix for the services environment specific DNS names. eg `l.dns.porn`, `test.project.com`
+
+Note: `network_mode: "host"` Is only needed for local development.
 
 ## Features
 
-- Local DNS based routing with dns.pron.
+- Local DNS based routing with l.dns.pron.
 - SSL support (self-signed)
 
 ## Build
@@ -47,6 +66,15 @@ docker run -e NODE_ENV='dev' -p 10202:10202 -dit --name dummy-service-two dummy-
 
 ### Domains
 
-- [dummy-service-one.l.dns.porn](http://dummy-service-one.l.dns.porn/)
+Proxy
 
-- [dummy-service-two.l.dns.porn](http://dummy-service-two.l.dns.porn/)
+- [dummy-service-one.l.dns.porn:11111](http://dummy-service-one.l.dns.porn:11111)
+
+- [dummy-service-two.l.dns.porn:11111](http://dummy-service-two.l.dns.porn:11111)
+
+
+Gateway
+
+- [gateway.l.dns.porn/dummy-service-one/](https://gateway.l.dns.porn/dummy-service-one/)
+
+- [gateway.l.dns.porn/dummy-service-two/](https://gateway.l.dns.porn/dummy-service-two/)
