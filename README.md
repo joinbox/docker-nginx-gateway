@@ -1,14 +1,16 @@
 # Nginx Gateway Docker Container
 
-A Docker container with Nginx serving as gateway for the two dummy projects.
+A Docker container with Nginx serving as gateway for the two dummy projects.  
 A [proxy](https://github.com/jwilder/nginx-proxy) for the service resolution.
 
 **How it works**
 
 You access your servicese trought the gateway eg. `gateway.l.dns.porn/dummy-service-one/query`
-The gateway rewrites the request to match the DNS name: The first part of the path represents the service name, the rest of the path is the query.
+The gateway rewrites the request to match the DNS name: The first part of the path represents the service name, the rest of the path is the query. The gateway adds the configured dns-postfix eg `.com` the the service name to create a propper DNS name.
 After rewriting the gateway adds the service DNS name as proxy path.
 The idea is to have on gateway for the Project to handle external request and one proxy per docker host to resolve the services on the host.
+
+![Setup Graphic](/docs/setup.png)
 
 
 **Configuration**
@@ -23,7 +25,7 @@ Note: `network_mode: "host"` Is only needed for local development.
 
 ## Features
 
-- Local DNS based routing with l.dns.pron.
+- Local DNS based routing with l.dns.pron. (dns.porn works the same as xip.io)
 - SSL support (self-signed)
 
 ## Build
