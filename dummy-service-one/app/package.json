@@ -4,7 +4,8 @@
   "description": "A Ubuntu based Docker template for Node.js Applications",
   "main": "index.js",
   "dependencies": {
-    "express": "^4.16.2"
+    "express": "^4.16.2",
+    "nodemon": "^1.14.12"
   },
   "devDependencies": {},
   "scripts": {

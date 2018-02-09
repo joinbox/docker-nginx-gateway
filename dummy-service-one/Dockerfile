@@ -43,6 +43,7 @@ RUN sudo apt-get install -y nodejs
 
 # Configure npm
 RUN mkdir -p /home/ubuntu/npm && npm config set prefix /home/ubuntu/npm
+RUN npm install -g nodemon
 ENV PATH $PATH:/home/ubuntu/npm/bin
 
 # Remove deployment key for github
