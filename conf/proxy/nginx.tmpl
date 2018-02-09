@@ -69,7 +69,8 @@ include /etc/nginx/proxy.conf;
 {{ else }}
 # HTTP 1.1 support
 proxy_http_version 1.1;
-proxy_buffering off;
+# proxy_cahce needs the proxy buffering to work
+proxy_buffering on;
 proxy_set_header Host $http_host;
 proxy_set_header Upgrade $http_upgrade;
 proxy_set_header Connection $proxy_connection;
@@ -78,6 +79,7 @@ proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
 proxy_set_header X-Forwarded-Proto $proxy_x_forwarded_proto;
 proxy_set_header X-Forwarded-Ssl $proxy_x_forwarded_ssl;
 proxy_set_header X-Forwarded-Port $proxy_x_forwarded_port;
+add_header X-Cache $upstream_cache_status;
 
 # Mitigate httpoxy attack (see README for details)
 proxy_set_header Proxy "";
@@ -286,6 +288,12 @@ server {
 	{{ end }}
 
 	location / {
+		proxy_cache microservice_cache;
+		proxy_cache_revalidate on;
+		#proxy_cache_use_stale error timeout updating http_500 http_502 http_503 http_504;
+		#proxy_cache_background_update on;
+		proxy_cache_lock on;
+
 		{{ if eq $proto "uwsgi" }}
 		include uwsgi_params;
 		uwsgi_pass {{ trim $proto }}://{{ trim $upstream_name }};
@@ -305,11 +313,6 @@ server {
 		{{ else if (exists "/etc/nginx/vhost.d/default_location") }}
 		include /etc/nginx/vhost.d/default_location;
 		{{ end }}
-
-		proxy_cache microservice_proxy_cache;
-		proxy_cache_valid      	200  1d;
-		proxy_cache_use_stale  	error timeout invalid_header updating
-								http_500 http_502 http_503 http_504;
 	}
 }
 
