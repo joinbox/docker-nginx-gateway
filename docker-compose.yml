@@ -7,9 +7,11 @@ services:
       - NODE_ENV=dev
       - NETWORK_ACCESS=internal
       - VIRTUAL_HOST=dummy-service-one.l.dns.porn
-    command: node /home/ubuntu/app/index.js
+    command: /home/ubuntu/app/node_modules/.bin/nodemon /home/ubuntu/app/index.js
     ports:
       - "10201:10201"
+    volumes:
+        - ./dummy-service-one/app:/home/ubuntu/app/
   dummy-service-two:
     image: dummy-service-two
     container_name: 'dummy-service-two'
@@ -28,6 +30,7 @@ services:
     volumes:
       - /etc/nginx/conf.d
       - ./conf/proxy/network_internal.conf:/etc/nginx/network_internal.conf
+      - ./conf/proxy/proxy_cache.conf:/etc/nginx/conf.d/proxy_cache.conf
   dockergen:
     image: jwilder/docker-gen
     command: -notify-sighup proxy -watch /etc/docker-gen/templates/nginx.tmpl /etc/nginx/conf.d/default.conf

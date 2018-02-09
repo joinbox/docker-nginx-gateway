@@ -305,6 +305,11 @@ server {
 		{{ else if (exists "/etc/nginx/vhost.d/default_location") }}
 		include /etc/nginx/vhost.d/default_location;
 		{{ end }}
+
+		proxy_cache microservice_proxy_cache;
+		proxy_cache_valid      	200  1d;
+		proxy_cache_use_stale  	error timeout invalid_header updating
+								http_500 http_502 http_503 http_504;
 	}
 }
 
