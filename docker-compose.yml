@@ -22,6 +22,18 @@ services:
     command: node /home/ubuntu/app/index.js
     ports:
       - "10202:10202"
+  loopback-microservice:
+    image: node:latest
+    container_name: 'loopback-microservice'
+    environment:
+      - NODE_ENV=dev
+      - NETWORK_ACCESS=internal
+      - VIRTUAL_HOST=loopback-microservice.l.dns.porn
+    command: /bin/bash -c "cd /home/ubuntu/app/ && node index.js"
+    ports:
+      - "11100:11100"
+    volumes:
+        - ./loopback-microservice-template:/home/ubuntu/app/
   proxy:
     image: nginx
     container_name: proxy
@@ -49,3 +61,14 @@ services:
     ports:
       - "80:80"
       - "443:443"
+  book-microservice-postgres:
+    image: postgres:latest
+    container_name: 'book-microservice-postgres'
+    environment:
+      - POSTGRES_PASSWORD=book-microservice
+      - POSTGRES_USER=book-microservice
+      - POSTGRES_DB=book-microservice
+    restart: always
+    command: postgres
+    ports:
+      - "5432:5432"
